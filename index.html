@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Prize Pop - Event Registration</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #002b24 0%, #000c0a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .serif-font { font-family: 'Cinzel', serif; }
+        .gold-gradient-text {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            display: inline-block;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 32rem;
+        }
+        .gold-button {
+            background: linear-gradient(45deg, #d4af37, #f1c40f);
+            color: #002b24;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+        .gold-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+        }
+        input::placeholder { color: rgba(255, 255, 255, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="glass-panel" id="mainCard">
+        <div class="text-center mb-8">
+            <h2 class="text-white/60 text-[10px] tracking-[0.5em] uppercase mb-2">SMGR Agricultural College</h2>
+            <h1 class="serif-font gold-gradient-text text-5xl font-bold mb-2">PRIZE POP</h1>
+            <div class="h-0.5 w-20 bg-[#d4af37] mx-auto mb-4 opacity-50"></div>
+            <p class="text-white/80 italic text-xs tracking-wider">A Curated New Year Experience</p>
+        </div>
+
+        <form id="regForm" class="space-y-5">
+            <input type="text" name="name" required class="w-full bg-black/30 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-[#d4af37] transition-all" placeholder="Full Name">
+            
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" name="year" required class="bg-black/30 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-[#d4af37] transition-all" placeholder="Batch Year">
+                <input type="text" name="section" required class="bg-black/30 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-[#d4af37] transition-all" placeholder="Section">
+            </div>
+
+            <input type="email" name="email" required class="w-full bg-black/30 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-[#d4af37] transition-all" placeholder="Email Address">
+
+            <input type="text" name="phone" required class="w-full bg-black/30 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-[#d4af37] transition-all" placeholder="WhatsApp Number">
+
+            <button type="submit" class="w-full gold-button py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-sm">REGISTER</button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-white/5 text-center">
+            <p class="text-white/40 text-[10px] uppercase tracking-widest leading-loose">
+                Dept of Pathology | Laboratory 2<br>
+                "A Modest Investment for Limitless Rewards"
+            </p>
+        </div>
+    </div>
+
+    <div id="successModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center hidden z-50 p-6">
+        <div class="glass-panel text-center scale-95 transition-all">
+            <div class="w-16 h-16 bg-[#d4af37]/20 border-2 border-[#d4af37] rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-[#d4af37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h2 class="serif-font gold-gradient-text text-3xl font-bold mb-2">Success!</h2>
+            <p class="text-white/80 mb-8 text-sm">Your spot in the Lucky Dip is secured.<br><span class="italic text-[#d4af37]">Participate. Explore. Prosper.</span></p>
+            <button onclick="window.location.reload()" class="gold-button px-10 py-3 rounded-xl font-bold uppercase text-xs">Done</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            const response = await fetch('/register-json', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                document.getElementById('successModal').classList.remove('hidden');
+                document.getElementById('mainCard').classList.add('blur-sm');
+            }
+        });
+    </script>
+</body>
+</html>
