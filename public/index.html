@@ -9,81 +9,143 @@
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
+            /* High-energy Blue & Deep Red Background */
             background: radial-gradient(circle at center, #1e3a8a 0%, #172554 40%, #450a0a 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center; justify-content: center;
-            padding: 1.5rem; margin: 0;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
         }
         .serif-font { font-family: 'Cinzel', serif; }
+        
         .gold-gradient-text {
             background: linear-gradient(to right, #fde047, #facc15, #ef4444, #dc2626);
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent; display: inline-block;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
         }
+
         .glass-panel {
             background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(250, 204, 21, 0.3);
-            border-radius: 2.5rem; padding: 2.5rem;
-            width: 100%; max-width: 32rem; position: relative;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(220, 38, 38, 0.1);
+            border-radius: 2.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 32rem;
         }
+
         .input-field {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; width: 100%; padding: 1rem; border-radius: 0.75rem; outline: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .token-input { border: 2px dashed #dc2626; background: rgba(220, 38, 38, 0.05); }
+        .input-field:focus {
+            border-color: #facc15;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.2);
+            background: rgba(30, 58, 138, 0.4);
+        }
+
+        /* Number of Tokens styling - Red/Yellow accent */
+        .token-input {
+            border: 2px dashed #dc2626;
+            background: rgba(220, 38, 38, 0.05);
+        }
+        .token-input:focus {
+            border-style: solid;
+            border-color: #facc15;
+        }
+
         .primary-btn {
             background: linear-gradient(45deg, #b91c1c, #dc2626, #facc15);
-            background-size: 200% auto; color: white; font-weight: 800;
-            width: 100%; py: 1.25rem; border-radius: 1rem; transition: 0.5s;
+            background-size: 200% auto;
+            color: white;
+            font-weight: 800;
+            transition: 0.5s;
+            animation: pulse-red 2s infinite;
         }
-        #successMessage {
-            display: none; position: absolute; inset: 0;
-            background: rgba(15, 23, 42, 0.95); z-index: 50;
-            flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; border-radius: 2.5rem; padding: 2rem;
+        .primary-btn:hover {
+            background-position: right center;
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.5);
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+
+        .logo-img {
+            height: 80px;
+            width: 80px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: white;
+            padding: 4px;
+            border: 3px solid #facc15;
+            box-shadow: 0 0 25px rgba(220, 38, 38, 0.4);
         }
     </style>
 </head>
 <body>
-    <div class="glass-panel">
-        <div id="successMessage">
-            <h2 class="serif-font gold-gradient-text text-3xl font-bold mb-2">SUCCESS!</h2>
-            <p class="text-white/80 mb-6">Registration Complete.</p>
-            <button onclick="window.location.reload()" class="text-yellow-400 border border-yellow-400 px-6 py-2 rounded-lg">Back</button>
-        </div>
-
+    <div class="glass-panel" id="mainCard">
         <div class="text-center mb-8">
-            <h2 class="text-yellow-400/80 text-[10px] tracking-[0.5em] uppercase mb-4">SMGR Agricultural College</h2>
+            <h2 class="text-yellow-400/80 text-[10px] font-bold tracking-[0.5em] uppercase mb-4">SMGR Agricultural College</h2>
+            
             <div class="flex items-center justify-center gap-4 mb-3">
-                <img src="logo.jpeg" alt="Logo" class="w-20 h-20 rounded-full border-2 border-yellow-400 object-cover" onerror="this.src='https://via.placeholder.com/80'">
-                <h1 class="serif-font gold-gradient-text text-4xl font-extrabold">PRIZE POP</h1>
+                <img src="logo.jpeg.jpeg" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+                <h1 class="serif-font gold-gradient-text text-4xl font-extrabold tracking-tighter">PRIZE POP</h1>
             </div>
+
+            <div class="h-1 w-24 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent mx-auto mb-4"></div>
+            <p class="text-white/90 font-medium italic text-xs tracking-[0.2em]">A Curated New Year Experience</p>
         </div>
 
         <form id="regForm" class="space-y-4">
-            <input type="text" name="name" required class="input-field" placeholder="Full Name">
-            <div class="grid grid-cols-2 gap-4">
-                <input type="text" name="year" required class="input-field" placeholder="Batch Year">
-                <input type="text" name="section" required class="input-field" placeholder="Section">
-            </div>
-            <input type="email" name="email" required class="input-field" placeholder="Email Address">
-            <input type="text" name="phone" required class="input-field" placeholder="WhatsApp Number">
+            <input type="text" name="name" required class="input-field w-full p-4 rounded-xl outline-none" placeholder="Full Name">
             
-            <div class="relative">
-                <input type="number" name="tokens" required min="1" class="input-field token-input" placeholder="Number of Tokens">
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" name="year" required class="input-field p-4 rounded-xl outline-none" placeholder="Batch Year">
+                <input type="text" name="section" required class="input-field p-4 rounded-xl outline-none" placeholder="Section">
             </div>
 
-            <button type="submit" class="primary-btn py-4 uppercase tracking-[0.2em] mt-4">Confirm Registration</button>
+            <input type="email" name="email" required class="input-field w-full p-4 rounded-xl outline-none" placeholder="Email Address">
+            <input type="text" name="phone" required class="input-field w-full p-4 rounded-xl outline-none" placeholder="WhatsApp Number">
+
+            <div class="relative">
+                <input type="number" name="tokens" required min="1" class="input-field token-input w-full p-4 rounded-xl outline-none placeholder:text-yellow-200/40" placeholder="Number of Tokens">
+                <span class="absolute right-4 top-4 text-yellow-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                </span>
+            </div>
+
+            <button type="submit" class="primary-btn w-full py-5 rounded-2xl uppercase tracking-[0.3em] text-sm mt-4">
+                CONFIRM REGISTRATION
+            </button>
         </form>
+
+        <div class="mt-8 pt-6 border-t border-yellow-500/10 text-center">
+            <p class="text-white/40 text-[9px] uppercase tracking-[0.4em] font-semibold leading-loose">
+                Dept of Pathology | Laboratory 2<br>
+                <span class="text-yellow-400">"A Modest Investment for Limitless Rewards"</span>
+            </p>
+        </div>
     </div>
 
     <script>
-        document.getElementById('regForm').addEventListener('submit', async (e) => {
+        document.getElementById('regForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            document.getElementById('successMessage').style.display = 'flex';
+            const tokenCount = e.target.tokens.value;
+            alert(`🔥 Registration Confirmed! Tokens secured: ${tokenCount}`);
         });
     </script>
 </body>
