@@ -1,6 +1,7 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
@@ -8,100 +9,85 @@
     <style>
         body { font-family: 'Montserrat', sans-serif; background: #01110e; color: #e2e8f0; }
         .serif-font { font-family: 'Cinzel', serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .gold-accent { color: #d4af37; }
     </style>
 </head>
-<div id="dashboardSection" class="hidden max-w-6xl mx-auto">
-    <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-8">
-        <div>
-            <h1 class="serif-font gold-accent text-5xl mb-2">Participant Registry</h1>
-            <p class="text-white/40 uppercase tracking-[0.3em] text-[10px]">Department of Pathology | SMGR College</p>
-        </div>
-        <div class="flex gap-4 mt-6">
-            <button onclick="clearData()" class="bg-red-900/40 hover:bg-red-600 text-white/70 px-6 py-3 rounded-xl transition text-[10px] font-bold border border-red-500/20">
-                🗑️ CLEAR ALL
-            </button>
-            <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold transition flex items-center gap-2">
-                💾 EXPORT EXCEL
-            </button>
-            <button onclick="location.reload()" class="bg-white/5 hover:bg-white/10 text-white px-8 py-3 rounded-xl transition uppercase text-xs tracking-widest font-bold">Exit</button>
-        </div>
-    </div>
+<body class="min-h-screen p-8">
 
-    <div class="glass-card rounded-[2rem] overflow-hidden shadow-2xl">
-        <table class="w-full text-left">
-            <thead class="bg-white/5 text-[#d4af37] text-[10px] uppercase font-bold tracking-widest">
-                <tr>
-                    <th class="p-6">Index</th>
-                    <th class="p-6">Full Name</th>
-                    <th class="p-6">Year & Section</th>
-                    <th class="p-6">Phone Number</th>
-                </tr>
-            </thead>
-            <tbody id="dataTable" class="divide-y divide-white/5 text-sm">
+    <div id="dashboardSection" class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-8">
+            <div>
+                <h1 class="serif-font gold-accent text-5xl mb-2">Participant Registry</h1>
+                <p class="text-white/40 uppercase tracking-[0.3em] text-[10px]">Department of Pathology | SMGR College</p>
+            </div>
+            <div class="flex gap-4 mt-6">
+                <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold transition">💾 EXPORT EXCEL</button>
+                <button onclick="clearData()" class="bg-red-900/40 hover:bg-red-600 text-white px-6 py-3 rounded-xl transition text-[10px]">🗑️ CLEAR ALL</button>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-[2rem] overflow-hidden shadow-2xl">
+            <table class="w-full text-left">
+                <thead class="bg-white/5 text-[#d4af37] text-[10px] uppercase font-bold tracking-widest">
+                    <tr>
+                        <th class="p-6">Index</th>
+                        <th class="p-6">Full Name</th>
+                        <th class="p-6">Details</th>
+                        <th class="p-6">Phone</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTable" class="divide-y divide-white/5 text-sm">
+                    <tr><td colspan="4" class="p-20 text-center text-white/20 italic">Loading data...</td></tr>
                 </tbody>
-        </table>
+            </table>
+        </div>
     </div>
-</div>
 
-<script>
-    async function checkLogin() {
-        const pass = document.getElementById('pass').value;
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({username: 'admin', password: pass})
-        });
-        if (res.ok) {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('dashboardSection').classList.remove('hidden');
-            loadData();
-        } else { alert("Unauthorized Access"); }
-    }
+    <script>
+        async function loadData() {
+            try {
+                const res = await fetch('/api/admin/data');
+                const data = await res.json();
+                window.excelData = data;
+                const table = document.getElementById('dataTable');
+                
+                if (data.length === 0) {
+                    table.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-white/20 italic">No registrations found yet.</td></tr>';
+                    return;
+                }
 
-    async function loadData() {
-        try {
-            const res = await fetch('/api/admin/data');
-            const data = await res.json();
-            window.excelData = data;
-            const table = document.getElementById('dataTable');
-            
-            if (data.length === 0) {
-                table.innerHTML = `<tr><td colspan="4" class="p-20 text-center text-white/20 italic">No participants registered yet.</td></tr>`;
-                return;
+                table.innerHTML = data.map((u, index) => `
+                    <tr>
+                        <td class="p-6 text-white/30">#${index + 1}</td>
+                        <td class="p-6 font-semibold gold-accent uppercase">${u.name}</td>
+                        <td class="p-6 text-white/70">${u.year || u.batch || ''} - ${u.section || ''}</td>
+                        <td class="p-6 text-white/50">${u.phone || ''}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Fetch error:", err);
             }
-
-            table.innerHTML = data.map((u, index) => `
-                <tr class="transition-colors hover:bg-white/5">
-                    <td class="p-6 text-white/30 font-mono text-xs">#${index + 1}</td>
-                    <td class="p-6 font-semibold gold-accent uppercase tracking-wide">${u.name}</td>
-                    <td class="p-6 text-white/70">${u.year || 'N/A'} — ${u.section || 'N/A'}</td>
-                    <td class="p-6 font-mono text-xs text-white/50">${u.phone || 'No Phone'}</td>
-                </tr>
-            `).join('');
-        } catch (err) {
-            console.error("Fetch error:", err);
         }
-    }
 
-    // New: Function to clear data for a fresh start
-    async function clearData() {
-        if (confirm("⚠️ Are you sure? This will delete all registrations permanently!")) {
-            await fetch('/api/admin/clear', { method: 'POST' });
-            loadData();
+        async function clearData() {
+            if (confirm("Delete all registrations?")) {
+                await fetch('/api/admin/clear', { method: 'POST' });
+                loadData();
+            }
         }
-    }
 
-    function exportToExcel() {
-        if (!window.excelData || window.excelData.length === 0) {
-            alert("No data to export!");
-            return;
+        function exportToExcel() {
+            const ws = XLSX.utils.json_to_sheet(window.excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Participants");
+            XLSX.writeFile(wb, "LuckyDip_Registrations.xlsx");
         }
-        const ws = XLSX.utils.json_to_sheet(window.excelData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Participants");
-        XLSX.writeFile(wb, "LuckyDip_Registrations.xlsx");
-    }
-</script>
 
+        // Run immediately
+        loadData();
+        // Refresh every 30 seconds automatically
+        setInterval(loadData, 30000);
+    </script>
+</body>
+</html>
