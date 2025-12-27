@@ -8,10 +8,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Database Setup
+// --- DATABASE SETUP (Updated to include tokens) ---
 db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT, year TEXT, section TEXT, email TEXT, phone TEXT
+    name TEXT, 
+    year TEXT, 
+    section TEXT, 
+    email TEXT, 
+    phone TEXT,
+    tokens INTEGER
 )`);
 
 // --- 1. ADMIN LOGIN & DATA API ---
@@ -24,55 +29,48 @@ app.post('/api/login', (req, res) => {
     }
 });
 
+// Fetch all registered students for the admin panel
 app.get('/api/admin/data', (req, res) => {
     db.all("SELECT * FROM users", [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
         res.json(rows || []);
     });
 });
 
-// --- 2. HANDLE REGISTRATION ---
-app.post('/register', (req, res) => {
-    const { name, year, section, email, phone } = req.body;
-    const stmt = db.prepare("INSERT INTO users (name, year, section, email, phone) VALUES (?, ?, ?, ?, ?)");
-    stmt.run(name, year, section, email, phone);
-    stmt.finalize();
-    res.send(`
-        <body style="background:#5a0001; color:white; font-family:sans-serif; text-align:center; padding-top:100px;">
-            <h1>Successfully Registered!</h1>
-            <p>Participate. Explore. Prosper.</p>
-            <a href="/" style="color:#d4af37;">Go Back</a>
-        </body>
-    `);
-});
-app.post('/register-json', (req, res) => {
-    const { name, year, section, email, phone } = req.body;
-    // Note: Added 'email' to both columns and values
-    const stmt = db.prepare("INSERT INTO users (name, year, section, email, phone) VALUES (?, ?, ?, ?, ?)");
-    stmt.run(name, year, section, email, phone, (err) => {
-        if (err) return res.status(500).json({ success: false });
-        res.json({ success: true });
+// --- 2. HANDLE REGISTRATION (Updated) ---
+// This route now handles the JSON data sent by the "Success Message" script
+app.post('/api/register', (req, res) => {
+    const { name, year, section, email, phone, tokens } = req.body;
+    
+    const query = `INSERT INTO users (name, year, section, email, phone, tokens) VALUES (?, ?, ?, ?, ?, ?)`;
+    
+    db.run(query, [name, year, section, email, phone, tokens], function(err) {
+        if (err) {
+            console.error("Database Error:", err.message);
+            return res.status(500).json({ success: false, error: err.message });
+        }
+        console.log(`New Registration: ${name} with ${tokens} tokens`);
+        res.json({ success: true, id: this.lastID });
     });
-    stmt.finalize();
 });
 
 // --- 3. SERVE PAGES ---
-
-// Registration Page (Home)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Admin Page (The fix)
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
-// Use path.join to ensure the server finds the right directory on Render
 
-
-app.listen(3000, () => {
+// Use Render's dynamic port or default to 3000
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
     console.log('------------------------------------------');
-    console.log('✅ SERVER IS LIVE');
-    console.log('📝 Registration: http://localhost:3000');
-    console.log('🔑 Admin Panel:  http://localhost:3000/admin');
+    console.log(`✅ SERVER IS LIVE ON PORT ${PORT}`);
+    console.log(`📝 Registration: http://localhost:${PORT}`);
+    console.log(`🔑 Admin Panel:  http://localhost:${PORT}/admin`);
     console.log('------------------------------------------');
 });
