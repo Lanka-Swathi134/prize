@@ -6,6 +6,7 @@ const db = new sqlite3.Database('./participants.db');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
 // Database Setup
 db.run(`CREATE TABLE IF NOT EXISTS users (
@@ -65,6 +66,8 @@ app.get('/', (req, res) => {
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
+// Use path.join to ensure the server finds the right directory on Render
+
 
 app.listen(3000, () => {
     console.log('------------------------------------------');
